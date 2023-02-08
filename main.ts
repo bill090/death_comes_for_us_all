@@ -1,14 +1,15 @@
 game.splash("welcome to ")
 
-game.splash("")
+game.splash("___________")
 
 let permaSpeed=50
 
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (herald2, enemy2) {
-    info.changeLifeBy(-1)
     enemy2.destroy(effects.disintegrate, 200)
     scene.cameraShake(4, 500)
+    info.changeLifeBy(-1)
     spawnEnemy()
+    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy, effects.disintegrate, 200)
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (herald2, enemy2) {
     info.changeLifeBy(1)
@@ -37,6 +38,37 @@ function spawnEnemy () {
     enemy.ay = 70
     enemy.setBounceOnWall(true)
 }
+
+function parry() {
+    let parry = sprites.create(img`
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . 9 9 9 9 . . . . . .
+        . . . . 9 9 . . . . 9 9 . . . .
+        . . . 9 . . . . . . . . 9 . . .
+        . . 9 . . . . . . . . . . 9 . .
+        . . 9 . . . . . . . . . . 9 . .
+        . 9 . . . . . . . . . . . . 9 .
+        . 9 . . . . . . . . . . . . 9 .
+        . 9 . . . . . . . . . . . . 9 .
+    `, SpriteKind.Projectile)
+    parry.setPosition(herald.x, herald.y)
+    info.startCountdown(0.25)
+    info.onCountdownEnd(function () {
+        parry.destroy(effects.warmRadial)
+    })
+}
+
+controller.player1.onButtonEvent(ControllerButton.A, ControllerButtonEvent.Pressed, function () {
+    parry()
+})
+
 controller.player1.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Pressed, function () {
     recent = "left"
 })
@@ -449,7 +481,7 @@ game.onUpdateInterval(interval, function () {
     interval += 2000
     info.changeScoreBy(1)
 })
-game.onUpdateInterval(10000, function() {
+game.onUpdateInterval(5000, function() {
     spawnBuff()
 })
 game.onUpdateInterval(150, function () {

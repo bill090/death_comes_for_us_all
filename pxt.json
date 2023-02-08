@@ -1,5 +1,5 @@
 {
-    "name": "avoid junk food",
+    "name": "death comes for us all",
     "description": "",
     "dependencies": {
         "device": "*"
@@ -25,5 +25,5 @@
     "supportedTargets": [
         "arcade"
     ],
-    "preferredEditor": "blocksprj"
+    "preferredEditor": "tsprj"
 }

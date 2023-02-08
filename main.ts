@@ -1,16 +1,39 @@
+game.splash("welcome to ")
+
+game.splash("")
+
+let permaSpeed=50
+
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (herald2, enemy2) {
     info.changeLifeBy(-1)
     enemy2.destroy(effects.disintegrate, 200)
     scene.cameraShake(4, 500)
     spawnEnemy()
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (herald2, enemy2) {
+    info.changeLifeBy(1)
+    if (permaSpeed<=100) {
+        permaSpeed=permaSpeed+10
+    }
+    enemy2.destroy(effects.disintegrate, 200)
+    scene.cameraShake(4, 500)
+    spawnBuff()
+})
 controller.player1.onButtonEvent(ControllerButton.Right, ControllerButtonEvent.Pressed, function () {
     recent = "right"
 })
+
+function spawnBuff () {
+    buff = sprites.create(buffImgs[randint(0, 1)], SpriteKind.Food)
+    buff.setPosition(randint(-160, 160), 0)
+    buff.setVelocity(randint(-50, 50), 0)
+    buff.ay = 25
+}
+
 function spawnEnemy () {
     enemy = sprites.create(enemyImgs[randint(0, 2)], SpriteKind.Enemy)
-    enemy.setPosition(randint(0, 160), 0)
-    enemy.setVelocity(50, 50)
+    enemy.setPosition(randint(-160, 160), 0)
+    enemy.setVelocity(50, 0)
     enemy.ay = 70
     enemy.setBounceOnWall(true)
 }
@@ -20,7 +43,8 @@ controller.player1.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Pr
 let animationCounter = 0
 let enemy: Sprite = null
 let recent = ""
-let enemyImgs: Image[] = []
+let buff: Sprite = null
+
 let herald = sprites.create(img`
     . . . . . . . . . . . . . . . . 
     . . . . . . . c c c c c c . . . 
@@ -59,23 +83,23 @@ img`
     . . f f f f f f . . . . . . . . 
     `,
 img`
-    . . . . . . . . . . . . . . . . 
-    . . . c c c c c . . . . . . . . 
-    . . c 5 5 5 5 5 c c . . . . . . 
-    . c 5 5 5 5 5 5 5 5 c . . . . . 
-    . c 5 5 5 b b b b b b c . . . . 
-    . . c c b b 1 b b 1 1 c . . . . 
-    . . . c 1 1 1 b b 1 1 1 c . . . 
-    c c . c 1 1 1 b 1 1 1 1 c . . . 
-    c 5 b b 1 1 1 b 1 1 1 d c . . . 
-    c 5 5 5 1 b 1 b 1 c 1 d c c . . 
-    c 5 b b 1 b 1 1 1 1 1 d d c c . 
-    c c . f 1 b b 1 1 1 1 1 d d d f 
-    . . . f b b b 1 1 1 1 1 1 f f f 
-    . . f 5 5 b b b 1 1 1 f f . . . 
-    . . f 5 5 5 5 5 f f f . . . . . 
-    . . f f f f f f . . . . . . . . 
-    `,
+    . . . . . . . . . . . . . . . .
+    . . . c c c c c . . . . . . . .
+    . . c 5 5 5 5 5 c c . . . . . .
+    . c 5 5 5 5 5 5 5 5 c . . . . .
+    . c 5 5 5 b b b b b b c . . . .
+    . . c c b b 1 b b 1 1 c . . . .
+    . . . c 1 1 1 b b 1 1 1 c . . .
+    c c . c 1 1 1 b 1 1 1 1 c . . .
+    c 5 b b 1 1 1 b 1 1 1 d c . . .
+    c 5 5 5 1 b 1 b 1 c 1 d c c . .
+    c 5 b b 1 b 1 1 1 1 1 d d c c .
+    c c . f 1 b b 1 1 1 1 1 d d d f
+    . . . f b b b 1 1 1 1 1 1 f f f
+    . . f 5 5 b b b 1 1 1 f f . . .
+    . . f 5 5 5 5 5 f f f . . . . .
+    . . f f f f f f . . . . . . . .
+`,
 img`
     . . c c c c c . . . . . . . . . 
     . c c 5 5 5 5 c c c . . . . . . 
@@ -187,7 +211,7 @@ img`
     . . . . . . . . . . . . . . . . 
     `
 ]
-controller.moveSprite(herald, 50, 0)
+controller.moveSprite(herald, permaSpeed, 0)
 scene.setBackgroundImage(img`
     3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
     3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
@@ -310,7 +334,7 @@ scene.setBackgroundImage(img`
     1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     `)
-enemyImgs = [img`
+let enemyImgs = [img`
     . . d e e e e e e e e e e e e . 
     . . d e e e e e e e e e e e e . 
     . . d e e e e e 1 1 e e e e e . 
@@ -328,40 +352,79 @@ enemyImgs = [img`
     . . d e e e e e e e e e e e e . 
     . . d e e e e e e e e e e e e . 
     `, img`
-    . . . . . . 2 2 2 2 . . . . . . 
-    . . . . 2 2 3 3 3 3 2 e . . . . 
-    . . . 2 3 d 1 1 d d 3 2 e . . . 
-    . . 2 3 1 d 3 3 3 d d 3 e . . . 
-    . 2 3 1 3 3 3 3 3 d 1 3 b e . . 
-    . 2 1 d 3 3 3 3 d 3 3 1 3 b b . 
-    2 3 1 d 3 3 1 1 3 3 3 1 3 4 b b 
-    2 d 3 3 d 1 3 1 3 3 3 1 3 4 4 b 
-    2 d 3 3 3 1 3 1 3 3 3 1 b 4 4 e 
-    2 d 3 3 3 1 1 3 3 3 3 1 b 4 4 e 
-    e d 3 3 3 3 d 3 3 3 d d b 4 4 e 
-    e d d 3 3 3 d 3 3 3 1 3 b 4 b e 
-    e 3 d 3 3 1 d d 3 d 1 b b e e . 
-    . e 3 1 1 d d 1 1 1 b b e e e . 
-    . . e 3 3 3 3 3 3 b e e e e . . 
-    . . . e e e e e e e e e e . . . 
+        . . . . . . . f f . . . . . . .
+        . . . . . . f d d f . . . . . .
+        . . . . . . f 1 1 f . . . . . .
+        . . . . . f 1 1 1 1 f . . . . .
+        . . . . . f 1 1 1 1 f . . . . .
+        . . . . . f 1 1 1 1 f . . . . .
+        . . . . f 1 1 2 2 1 1 f . . . .
+        . . . . f 1 2 f f 2 1 f . . . .
+        . . . . f 1 2 f f 2 1 f . . . .
+        . . . . f 1 1 2 2 1 1 f . . . .
+        . . . . . f 1 1 1 1 f . . . . .
+        . . . . . f 1 1 1 1 f . . . . .
+        . . . . . f 1 1 1 1 f . . . . .
+        . . . . . . f 1 1 f . . . . . .
+        . . . . . . f d d f . . . . . .
+        . . . . . . . f f . . . . . . .
     `, img`
-    . . 2 2 b b b b b . . . . . . . 
-    . 2 b 4 4 4 4 4 4 b . . . . . . 
-    2 2 4 4 4 4 d d 4 4 b . . . . . 
-    2 b 4 4 4 4 4 4 d 4 b . . . . . 
-    2 b 4 4 4 4 4 4 4 d 4 b . . . . 
-    2 b 4 4 4 4 4 4 4 4 4 b . . . . 
-    2 b 4 4 4 4 4 4 4 4 4 e . . . . 
-    2 2 b 4 4 4 4 4 4 4 b e . . . . 
-    . 2 b b b 4 4 4 b b b e . . . . 
-    . . e b b b b b b b e e . . . . 
-    . . . e e b 4 4 b e e e b . . . 
-    . . . . . e e e e e e b d b b . 
-    . . . . . . . . . . . b 1 1 1 b 
-    . . . . . . . . . . . c 1 d d b 
-    . . . . . . . . . . . c 1 b c . 
-    . . . . . . . . . . . . c c . . 
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . 1 1 1 1 . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . 9 9 9 9 9 9 . . . . .
+        . . . 1 . 9 9 9 9 9 9 . 1 . . .
+        . . . 1 . 9 9 9 9 9 9 . 1 . . .
+        . . . 1 . 9 9 9 9 9 9 . 1 . . .
+        . . . 1 . 9 9 9 9 9 9 . 1 . . .
+        . . . . . 9 9 9 9 9 9 . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . 1 1 1 1 . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
     `]
+
+let buffImgs = [img`
+    . . f 2 2 2 2 2 2 2 2 2 2 2 2 .
+    . . f 2 2 2 2 2 2 2 2 2 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 1 1 1 1 1 1 2 2 2 .
+    . . f 2 2 2 1 1 1 1 1 1 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 2 2 1 1 2 2 2 2 2 .
+    . . f 2 2 2 2 2 2 2 2 2 2 2 2 .
+    . . f 2 2 2 2 2 2 2 2 2 2 2 2 .
+`,
+img`
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . 3 3 3 3 3 3 3 3 . . . .
+    . . . . 3 f f f f f f 3 . . . .
+    . . . . 3 f 1 1 1 1 f 3 . . . .
+    . . . . 3 f 1 2 2 1 f 3 . . . .
+    . . . . 3 f 1 2 2 1 f 3 . . . .
+    . . . . 3 f 1 1 1 1 f 3 . . . .
+    . . . . 3 f f f f f f 3 . . . .
+    . . . . 3 3 3 3 3 3 3 3 . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+`
+]
+
 info.setLife(3)
 let interval = 8000
 recent = "right"
@@ -370,6 +433,9 @@ herald.setStayInScreen(true)
 game.onUpdate(function () {
     if (info.life() < 1) {
         game.splash("you are a fool.")
+        game.splash("you are a buffon.")
+        game.splash("you meant nothing in this world.")
+        game.splash("you will mean nothing in the next.")
     }
     if (recent == "right") {
         herald.setImage(heraldRight[animationCounter])
@@ -382,6 +448,9 @@ game.onUpdateInterval(interval, function () {
     spawnEnemy()
     interval += 2000
     info.changeScoreBy(1)
+})
+game.onUpdateInterval(10000, function() {
+    spawnBuff()
 })
 game.onUpdateInterval(150, function () {
     if (animationCounter == 3) {
